@@ -1,6 +1,6 @@
 import Foundation
 import Curses
-//this is a test for github
+
 let screen = Screen.shared
 let keyboard = Keyboard.shared
 
@@ -29,14 +29,13 @@ let blue = Color.standard(.blue)
 let cyan = Color.standard(.cyan)
 let cyanOnBlue = colors.newPair(foreground:cyan, background:blue)
 
-mainWindow.write("test")
-
-var tutorial1 = [[0,0,0,0,0],[0,1,1,1,0],[0,1,1,1,0],[0,1,1,1,0],[0,0,0,0,0]]
+var tutorial1 = [[0,0,0,0,0],[0,1,1,1,0],[0,1,1,1,2],[0,1,1,1,0],[0,0,0,0,0]]
+var tutorial2 = [[0,0,0,0,0],[0,1,1,1,0],[0,1,0,1,0],[0,1,1,1,0],[0,0,0,0,0]]
 
 func mapBuild(plan: [[Int]]) {
     mainWindow.turnOn(cyanOnBlue)
-    let locationX = 5
-    var locationY = 5
+    let locationX = 2
+    var locationY = 2
     cursor.position = Point(x:locationX, y:locationY)
     for rows in plan {
         for cell in rows {
@@ -44,6 +43,8 @@ func mapBuild(plan: [[Int]]) {
                 mainWindow.write("█")
             } else if cell == 1 {
                 mainWindow.write(" ")
+            } else if cell == 2 {
+                mainWindow.write("༜")
             }
         }
         locationY += 1
@@ -52,8 +53,55 @@ func mapBuild(plan: [[Int]]) {
     mainWindow.refresh()
     mainWindow.turnOff(cyanOnBlue)
 }
-
+func mapSelect(number: Int)-> [[Int]] {
+    switch (number) {
+    case 1: return tutorial1
+    case 2: return tutorial2         
+    default: return tutorial1
+    }
+}
 mapBuild(plan:tutorial1)
-mainWindow.refresh()
+var currentMap = tutorial1
+var mapNumber = 1
+var mapPosition = Point(x:2,y:2)
+cursor.position = Point(x:4,y:4)
 
+while true {
+    let key = keyboard.getKey(window:mainWindow)
+    switch (key.keyType) {
+    case .arrowUp:
+        if currentMap[mapPosition.y-1][mapPosition.x] != 0 {
+            cursor.position = Point(x:cursor.position.x, y:cursor.position.y-1)
+            mapPosition = Point(x:mapPosition.x, y:mapPosition.y-1)
+            mainWindow.refresh()
+        }
+    case .arrowDown:
+        if currentMap[mapPosition.y+1][mapPosition.x] != 0 {
+            cursor.position = Point(x:cursor.position.x, y:cursor.position.y+1)
+            mapPosition = Point(x:mapPosition.x, y:mapPosition.y+1)
+            mainWindow.refresh()
+        }
+    case .arrowLeft:
+        if currentMap[mapPosition.y][mapPosition.x-1] != 0 {
+            cursor.position = Point(x:cursor.position.x-1, y:cursor.position.y)
+            mapPosition = Point(x:mapPosition.x-1, y:mapPosition.y)
+            mainWindow.refresh()
+        }
+    case .arrowRight:
+        if currentMap[mapPosition.y][mapPosition.x+1] == 2 {
+            mapNumber += 1
+            mapBuild(plan:mapSelect(number:mapNumber))
+            currentMap = tutorial2
+            cursor.position = Point(x:4, y:4)
+            mapPosition = Point(x:2,y:2)
+        }
+        if currentMap[mapPosition.y][mapPosition.x+1] != 0 {
+            cursor.position = Point(x:cursor.position.x+1, y:cursor.position.y)
+            mapPosition = Point(x:mapPosition.x+1, y:mapPosition.y)
+            mainWindow.refresh()
+        }
+    default: do {
+             }
+    }
+}
 screen.wait()
