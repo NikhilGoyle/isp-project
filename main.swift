@@ -31,7 +31,9 @@ let cyanOnBlue = colors.newPair(foreground:cyan, background:blue)
 mainWindow.turnOn(cyanOnBlue)
 
 var tutorial1 = [[0,0,0,0,0],[0,1,1,1,0],[0,1,1,1,2],[0,1,1,1,0],[0,0,0,0,0]]
-var tutorial2 = [[0,0,0,0,0],[0,1,1,1,0],[0,1,0,1,0],[0,1,1,1,0],[0,0,0,0,0]]
+var tutorial2 = [[0,0,0,0,0],[0,1,1,1,0],[0,1,0,1,0],[0,1,1,1,0],[0,1,1,1,0],[0,1,1,1,0,0,0,0,0,0],[0,1,1,1,1,1,1,1,1,0],[0,1,1,1,1,1,1,1,1,0],[0,1,1,1,1,1,1,1,1,0],[0,1,1,1,1,1,1,1,1,0],[0,0,0,0,2,0,0,0,0,0]]
+var tutorial3 = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,]]
+
 
 func colorSwitch(old:ColorPair, new:ColorPair) {
     mainWindow.turnOff(old)
@@ -40,6 +42,7 @@ func colorSwitch(old:ColorPair, new:ColorPair) {
 
 
 func mapBuild(plan: [[Int]]) {
+    mainWindow.clear()
     let locationX = 2
     var locationY = 2
     cursor.position = Point(x:locationX, y:locationY)
@@ -62,7 +65,10 @@ func mapBuild(plan: [[Int]]) {
 func mapSelect(number: Int)-> [[Int]] {
     switch (number) {
     case 1: return tutorial1
-    case 2: return tutorial2         
+    case 2: return tutorial2
+            
+    case 3: return maze.nextLevel
+            
     default: return tutorial1
     }
 }
@@ -86,9 +92,9 @@ while true {
             if currentMap[mapPosition.y-1][mapPosition.x] == 2 {
                 mapNumber += 1
                 mapBuild(plan:mapSelect(number:mapNumber))
-                currentMap = tutorial2
-                cursor.position = Point(x:4, y:4)
+                currentMap = mapSelect(number:mapNumber)
                 mapPosition = Point(x:2,y:2)
+                cursor.position = Point(x:4, y:4)
             }
             if currentMap[mapPosition.y-1][mapPosition.x] != 0 {
                 cursor.position = Point(x:cursor.position.x, y:cursor.position.y-1)
@@ -99,9 +105,9 @@ while true {
             if currentMap[mapPosition.y+1][mapPosition.x] == 2 {
                 mapNumber += 1
                 mapBuild(plan:mapSelect(number:mapNumber))
-                currentMap = tutorial2
-                cursor.position = Point(x:4, y:4)
+                currentMap = mapSelect(number:mapNumber)
                 mapPosition = Point(x:2,y:2)
+                cursor.position = Point(x:4, y:4)
             }
             if currentMap[mapPosition.y+1][mapPosition.x] != 0 {
                 cursor.position = Point(x:cursor.position.x, y:cursor.position.y+1)
@@ -112,9 +118,9 @@ while true {
             if currentMap[mapPosition.y][mapPosition.x-1] == 2 {
                 mapNumber += 1
                 mapBuild(plan:mapSelect(number:mapNumber))
-                currentMap = tutorial2
-                cursor.position = Point(x:4, y:4)
+                currentMap = mapSelect(number:mapNumber)
                 mapPosition = Point(x:2,y:2)
+                cursor.position = Point(x:4, y:4)
             }
             if currentMap[mapPosition.y][mapPosition.x-1] != 0 {
                 cursor.position = Point(x:cursor.position.x-1, y:cursor.position.y)
@@ -125,9 +131,9 @@ while true {
             if currentMap[mapPosition.y][mapPosition.x+1] == 2 {
                 mapNumber += 1
                 mapBuild(plan:mapSelect(number:mapNumber))
-                currentMap = tutorial2
-                cursor.position = Point(x:4, y:4)
+                currentMap = mapSelect(number:mapNumber)
                 mapPosition = Point(x:2,y:2)
+                cursor.position = Point(x:4, y:4)
             }
             if currentMap[mapPosition.y][mapPosition.x+1] != 0 {
                 cursor.position = Point(x:cursor.position.x+1, y:cursor.position.y)
@@ -145,7 +151,7 @@ while true {
     
     while wallbreaker {
         cursor.pushPosition(newPosition:Point(x:0,y:0))
-        mainWindow.write("Use the keys (w), (a), (s), and (d) to remove or create walls around you.")
+        mainWindow.write("Use the keys (w), (a), (s), and (d) to remove or create walls around you.")//add this to a variable so i can have an instructions bar
         cursor.popPosition()
         mainWindow.refresh()
         let key = keyboard.getKey(window:mainWindow)
