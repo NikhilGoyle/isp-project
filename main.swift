@@ -30,16 +30,15 @@ let cyan = Color.standard(.cyan)
 let cyanOnBlue = colors.newPair(foreground:cyan, background:blue)
 mainWindow.turnOn(cyanOnBlue)
 
-var tutorial1 = [[0,0,0,0,0],[0,1,1,1,0],[0,1,1,1,2],[0,1,1,1,0],[0,0,0,0,0]]
-var tutorial2 = [[0,0,0,0,0],[0,1,1,1,0],[0,1,0,1,0],[0,1,1,1,0],[0,1,1,1,0],[0,1,1,1,0,0,0,0,0,0],[0,1,1,1,1,1,1,1,1,0],[0,1,1,1,1,1,1,1,1,0],[0,1,1,1,1,1,1,1,1,0],[0,1,1,1,1,1,1,1,1,0],[0,0,0,0,2,0,0,0,0,0]]
-var tutorial3 = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,]]
-
-
 func colorSwitch(old:ColorPair, new:ColorPair) {
     mainWindow.turnOff(old)
     mainWindow.turnOn(new)
     }
 
+var currentMap = maps.tutorial1
+var mapNumber = 1
+var mapPosition = Point(x:2,y:2)
+var cursorPosition = Point(x:4,y:4)
 
 func mapBuild(plan: [[Int]]) {
     mainWindow.clear()
@@ -59,24 +58,27 @@ func mapBuild(plan: [[Int]]) {
         locationY += 1
         cursor.position = Point(x:locationX, y:locationY)
     }
+    cursor.position = cursorPosition
     mainWindow.refresh()
 }
 
 func mapSelect(number: Int)-> [[Int]] {
     switch (number) {
-    case 1: return tutorial1
-    case 2: return tutorial2
-            
-    case 3: return maze.nextLevel
-            
-    default: return tutorial1
+    case 1: mapPosition = Point(x:2,y:2)
+            cursorPosition = Point(x:4,y:4)
+            return maps.tutorial1
+    case 2: mapPosition = Point(x:2,y:2)
+            cursorPosition = Point(x:4,y:4)
+            return maps.tutorial2
+    default:
+        mapPosition = Point(x:2,y:2)
+        cursor.position = Point(x:4,y:4)
+        return maps.tutorial1
     }
 }
-mapBuild(plan:tutorial1)
-var currentMap = tutorial1
-var mapNumber = 1
-var mapPosition = Point(x:2,y:2)
-cursor.position = Point(x:4,y:4)
+
+mapBuild(plan:mapSelect(number:mapNumber))
+
 var standard = true
 var wallbreaker = false
 
@@ -93,8 +95,7 @@ while true {
                 mapNumber += 1
                 mapBuild(plan:mapSelect(number:mapNumber))
                 currentMap = mapSelect(number:mapNumber)
-                mapPosition = Point(x:2,y:2)
-                cursor.position = Point(x:4, y:4)
+                break
             }
             if currentMap[mapPosition.y-1][mapPosition.x] != 0 {
                 cursor.position = Point(x:cursor.position.x, y:cursor.position.y-1)
@@ -106,8 +107,7 @@ while true {
                 mapNumber += 1
                 mapBuild(plan:mapSelect(number:mapNumber))
                 currentMap = mapSelect(number:mapNumber)
-                mapPosition = Point(x:2,y:2)
-                cursor.position = Point(x:4, y:4)
+                break
             }
             if currentMap[mapPosition.y+1][mapPosition.x] != 0 {
                 cursor.position = Point(x:cursor.position.x, y:cursor.position.y+1)
@@ -119,8 +119,7 @@ while true {
                 mapNumber += 1
                 mapBuild(plan:mapSelect(number:mapNumber))
                 currentMap = mapSelect(number:mapNumber)
-                mapPosition = Point(x:2,y:2)
-                cursor.position = Point(x:4, y:4)
+                break
             }
             if currentMap[mapPosition.y][mapPosition.x-1] != 0 {
                 cursor.position = Point(x:cursor.position.x-1, y:cursor.position.y)
@@ -132,9 +131,8 @@ while true {
                 mapNumber += 1
                 mapBuild(plan:mapSelect(number:mapNumber))
                 currentMap = mapSelect(number:mapNumber)
-                mapPosition = Point(x:2,y:2)
-                cursor.position = Point(x:4, y:4)
-            }
+                break
+            } 
             if currentMap[mapPosition.y][mapPosition.x+1] != 0 {
                 cursor.position = Point(x:cursor.position.x+1, y:cursor.position.y)
                 mapPosition = Point(x:mapPosition.x+1, y:mapPosition.y)
