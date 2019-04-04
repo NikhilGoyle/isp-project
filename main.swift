@@ -34,14 +34,83 @@ let red = Color.standard(.red)
 let yellow = Color.standard(.yellow)
 let redOnYellow = colors.newPair(foreground:red, background:yellow)
 
-
-
 var currentMap = maps.tutorial1
 var backup = maps.tutorial1
 var backupCoordinates = Point(x:0,y:0)
 var mapNumber = 1
 var mapPosition = Point(x:2,y:2)
 var cursorPosition = Point(x:4,y:4)
+
+class Maze {
+/*
+    enum Cell {
+        case Space, Wall
+    }
+*/
+    var data: [[Int]] = []
+
+    // Generate a random maze.
+    init(width: Int, height: Int) {
+        for _ in 0 ..< height {
+            data.append([Int](repeating: 0, count: width))
+        }
+        for i in 0 ..< width {
+           data[0][i] = 1
+            data[height - 1][i] = 1
+        }
+        for i in 0 ..< height {
+            data[i][0] = 1
+            data[i][width - 1] = 1
+        }
+        data[2][2] = 1
+        self.carve(x: 2, y: 2)
+        data[1][2] = 1
+        data[height - 2][width - 3] = 2
+    }
+
+    // Carve starting at x, y.
+    func carve(x: Int, y: Int) {
+        let upx = [1, -1, 0, 0]
+        let upy = [0, 0, 1, -1]
+        var dir = Int.random(in:0...3)
+        var count = 0
+        while count < 4 {
+            let x1 = x + upx[dir]
+            let y1 = y + upy[dir]
+            let x2 = x1 + upx[dir]
+            let y2 = y1 + upy[dir]
+            if data[y1][x1] == 0 && data[y2][x2] == 0 {
+                data[y1][x1] = 1
+                data[y2][x2] = 1
+                carve(x: x2, y: y2)
+            } else {
+                dir = (dir + 1) % 4
+                count += 1
+            }
+        }
+    }
+
+    // Show the maze.
+    /*
+     func show() {
+     for row in data {
+     for cell in row {
+     if cell == 1 {
+     print("  ", separator: "", terminator: "")
+     } else if cell == 0 {
+     print("██", separator: "", terminator: "")
+     }
+     }
+     print("")
+     }
+     }
+     */
+
+}//class maze
+//generates random maze
+
+let maze1 = Maze(width: 45, height: 25)
+
 
 
 /*for rows in maps.loopTest {
@@ -90,13 +159,13 @@ func colorSwitch(old:ColorPair, new:ColorPair) {
 func mapSelect(number: Int)-> [[Int]] {
     switch (number) {
     case 1: mapPosition = Point(x:2,y:2)
-            cursorPosition = Point(x:5,y:5)
+            cursor.position = Point(x:5,y:5)
             return maps.tutorial1
-    case 2: mapPosition = Point(x:2,y:2)
-            cursorPosition = Point(x:5,y:5)
-            return maps.tutorial2
+    case 2: mapPosition = Point(x:2,y:1)
+            cursor.position = Point(x:5,y:4)
+            return maze1.data
     case 3: mapPosition = Point(x:5,y:1)
-            cursorPosition = Point(x:8,y:4)
+            cursor.position = Point(x:8,y:4)
             return maps.lava1
     default:
         mapPosition = Point(x:2,y:2)
