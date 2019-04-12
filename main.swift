@@ -35,9 +35,32 @@ class Maze {
         }
         data[2][2] = 1
         self.carve(x: 2, y: 2)
+        self.room(xSize:width,ySize:height)
         data[1][2] = 1
         data[height - 2][width - 3] = 2
     }
+
+    func room(xSize:Int,ySize:Int) {
+        let square1xstart = Int.random(in:2...xSize/4)
+        let square1xend = Int.random(in:xSize*3/8...xSize-xSize/4)
+        let square1ystart = Int.random(in:2...ySize/4)
+        let square1yend = Int.random(in:ySize*3/8...ySize-ySize/4)
+        let square2xstart = Int.random(in:xSize/4...xSize-xSize*3/8)
+        let square2xend = Int.random(in:xSize-xSize/4...xSize-2)
+        let square2ystart = Int.random(in:ySize/4...ySize-ySize*3/8)
+        let square2yend = Int.random(in:ySize-ySize/4...ySize-2)
+
+        for row in square1ystart...square1yend {
+            for cell in square1xstart...square1xend {
+                data[row][cell] = 1
+            }
+        }
+        for row in square2ystart...square2yend {
+            for cell in square2xstart...square2xend {
+                data[row][cell] = 1
+            }
+        }
+    }//func room
 
     // Carve out maze inside
     func carve(x: Int, y: Int) {
@@ -63,7 +86,7 @@ class Maze {
 }//class maze
 //generates random maze
 
-let maze1 = Maze(width: 45, height: 25)
+let maze1 = Maze(width: 50, height: 30)
 
 struct Items {
     var wallbreaker = false
