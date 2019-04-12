@@ -17,6 +17,85 @@ class Handler : CursesHandlerProtocol {
 
 let handler = Handler()
 
+class Maze {
+    var data: [[Int]] = []
+
+    // Generate a block with a start and end
+    init(width: Int, height: Int) {
+        for _ in 0 ..< height {
+            data.append([Int](repeating: 0, count: width))
+        }
+        for i in 0 ..< width {
+           data[0][i] = 1
+            data[height - 1][i] = 1
+        }
+        for i in 0 ..< height {
+            data[i][0] = 1
+            data[i][width - 1] = 1
+        }
+        data[2][2] = 1
+        self.carve(x: 2, y: 2)
+        data[1][2] = 1
+        data[height - 2][width - 3] = 2
+    }
+
+    // Carve out maze inside
+    func carve(x: Int, y: Int) {
+        let upx = [1, -1, 0, 0]
+        let upy = [0, 0, 1, -1]
+        var dir = Int.random(in:0...3)
+        var count = 0
+        while count < 4 {
+            let x1 = x + upx[dir]
+            let y1 = y + upy[dir]
+            let x2 = x1 + upx[dir]
+            let y2 = y1 + upy[dir]
+            if data[y1][x1] == 0 && data[y2][x2] == 0 {
+                data[y1][x1] = 1
+                data[y2][x2] = 1
+                carve(x: x2, y: y2)
+            } else {
+                dir = (dir + 1) % 4
+                count += 1
+            }
+        }
+    }
+}//class maze
+//generates random maze
+
+let maze1 = Maze(width: 45, height: 25)
+
+struct Items {
+    var wallbreaker = false
+    var lavafloor = false
+    var backpack = false
+    var resurrect = false
+    var con = false
+    var flag = false
+    var ration = false
+    var conflagration = false
+}
+
+class Player {
+    static var name = "Player"
+    static var health = 10
+    static var attackMelee = 3
+    static var attackRanged : Int?
+    static var items = Items()
+}
+
+class Enemy {
+    var name = "Enemy"
+    var health = 5
+    var attackMelee = 1
+    var attackRanged : Int?
+    var drops = Items()
+}
+
+print("Please enter your name: ", terminator:"")
+let player = Player()
+Player.name = readLine()!
+
 screen.startUp(handler:handler)
 let colors = Colors.shared
 precondition(colors.areSupported, "This terminal doesn't support colors")
@@ -41,75 +120,6 @@ var mapNumber = 1
 var mapPosition = Point(x:2,y:2)
 var cursorPosition = Point(x:4,y:4)
 
-class Maze {
-/*
-    enum Cell {
-        case Space, Wall
-    }
-*/
-    var data: [[Int]] = []
-
-    // Generate a random maze.
-    init(width: Int, height: Int) {
-        for _ in 0 ..< height {
-            data.append([Int](repeating: 0, count: width))
-        }
-        for i in 0 ..< width {
-           data[0][i] = 1
-            data[height - 1][i] = 1
-        }
-        for i in 0 ..< height {
-            data[i][0] = 1
-            data[i][width - 1] = 1
-        }
-        data[2][2] = 1
-        self.carve(x: 2, y: 2)
-        data[1][2] = 1
-        data[height - 2][width - 3] = 2
-    }
-
-    // Carve starting at x, y.
-    func carve(x: Int, y: Int) {
-        let upx = [1, -1, 0, 0]
-        let upy = [0, 0, 1, -1]
-        var dir = Int.random(in:0...3)
-        var count = 0
-        while count < 4 {
-            let x1 = x + upx[dir]
-            let y1 = y + upy[dir]
-            let x2 = x1 + upx[dir]
-            let y2 = y1 + upy[dir]
-            if data[y1][x1] == 0 && data[y2][x2] == 0 {
-                data[y1][x1] = 1
-                data[y2][x2] = 1
-                carve(x: x2, y: y2)
-            } else {
-                dir = (dir + 1) % 4
-                count += 1
-            }
-        }
-    }
-
-    // Show the maze.
-    /*
-     func show() {
-     for row in data {
-     for cell in row {
-     if cell == 1 {
-     print("  ", separator: "", terminator: "")
-     } else if cell == 0 {
-     print("██", separator: "", terminator: "")
-     }
-     }
-     print("")
-     }
-     }
-     */
-
-}//class maze
-//generates random maze
-
-let maze1 = Maze(width: 45, height: 25)
 
 
 
@@ -175,15 +185,19 @@ func mapSelect(number: Int)-> [[Int]] {
 }
 
 mapBuild(plan:mapSelect(number:mapNumber))
+cursor.pushPosition(newPosition:Point(x:0,y:0))
+mainWindow.write("Welcome, \(Player.name)! Use w,a,s,d to move around. Move to the portal to proceed")//combine all text into strings so there isnt any overlapping
+cursor.popPosition()
 
 var standard = true
 var wallbreaker = false
 var lavafloor = false
+var inventory = false
 
 while true {
     while standard {
         cursor.pushPosition(newPosition:Point(x:0,y:0))
-        mainWindow.write("                                                                         ")
+        //mainWindow.write("                                                                         ")
         cursor.popPosition()
         mainWindow.refresh()
         let key = keyboard.getKey(window:mainWindow)
@@ -245,9 +259,41 @@ while true {
                          lavafloor = true
                          standard = false
                      }
+                     if key.character == "i" {
+                         inventory = true
+                         standard = false
+                     }
                  }//do
         }//switchcase
     }//standard
+    while inventory {
+/*        mainWindow.write("""┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+                            ┃                                                   ┃
+                            ┃                                                   ┃
+                            ┃                                                   ┃
+                            ┃                                                   ┃
+                            ┃                                                   ┃
+                            ┃                                                   ┃
+                            ┃                                                   ┃
+                            ┃                                                   ┃
+                            ┃                                                   ┃
+                            ┃                                                   ┃
+                            ┃                                                   ┃
+                            ┃                                                   ┃
+                            ┃                                                   ┃
+                            ┃                                                   ┃
+                            ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+""")*/
+          let key = keyboard.getKey(window:mainWindow)
+        switch (key.keyType) {
+        default: do {
+                     if key.character == "i" {
+                         standard = true
+                         inventory = false
+                     }
+                 }
+        }
+    }
     
     while wallbreaker {
         cursor.pushPosition(newPosition:Point(x:0,y:0))
@@ -341,6 +387,10 @@ while true {
         }//switchcase
     }//wallbreaker
     while lavafloor {
+        cursor.pushPosition(newPosition:Point(x:0,y:0))
+        mainWindow.write("The floor is lava!")
+        cursor.popPosition()
+        mainWindow.refresh()
         colorSwitch(old:cyanOnBlue,new:redOnYellow)
         mapBuild(plan:currentMap)
         maps.backup = currentMap
