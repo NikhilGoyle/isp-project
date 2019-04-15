@@ -221,7 +221,7 @@ var backupCoordinates = Point(x:0,y:0)
 var mapNumber = 1
 var mapPosition = Point(x:2,y:2)
 var cursorPosition = Point(x:4,y:4)
-
+var lavacount = 0
 
 
 
@@ -362,6 +362,7 @@ while true {
                          standard = false
                      }
                      if key.character == "3" && currentMap[mapPosition.y][mapPosition.x] != 0 {
+                         colorSwitch(old:cyanOnBlue,new:redOnYellow)
                          lavafloor = true
                          standard = false
                      }
@@ -511,56 +512,121 @@ while true {
         cursor.pushPosition(newPosition:Point(x:0,y:0))
         mainWindow.write("The floor is lava!")
         cursor.popPosition()
+        mapBuild(plan:maps.lavaArray[lavacount])
         mainWindow.refresh()
-        colorSwitch(old:cyanOnBlue,new:redOnYellow)
-        mapBuild(plan:currentMap)
-        maps.backup = currentMap
-        backupCoordinates = cursor.position
         let key = keyboard.getKey(window:mainWindow)
         switch (key.keyType) {
         case .arrowUp:
-            if currentMap[mapPosition.y-1][mapPosition.x] == 1 {
-                currentMap[mapPosition.y][mapPosition.x] = 0
+            if maps.lavaArray[lavacount][mapPosition.y-1][mapPosition.x] == 1 {
+                maps.lavaArray[lavacount][mapPosition.y][mapPosition.x] = 0
                 cursor.position = Point(x:cursor.position.x, y:cursor.position.y-1)
                 mapPosition = Point(x:mapPosition.x, y:mapPosition.y-1)
                 mainWindow.refresh()
             }
-            else if currentMap[mapPosition.y-1][mapPosition.x] == 0 {
-                mapBuild(plan:maps.backup)//should be correct (but it isnt)
-                cursor.position = backupCoordinates
+            else if maps.lavaArray[lavacount][mapPosition.y-1][mapPosition.x] == 0 {
+                maps.lavaArray[lavacount] = maps.lavabackup
+                mapBuild(plan:mapSelect(number:mapNumber))
+            }
+            else if maps.lavaArray[lavacount][mapPosition.y-1][mapPosition.x] == 2 {
+                for row in maps.lavaArray[lavacount] {
+                    for cell in row {
+                        if cell == 0 {
+                            maps.lavaArray[lavacount] = maps.lavabackup
+                            mapBuild(plan:mapSelect(number:mapNumber))
+                            break
+                        }
+                    }
+                }
+                lavacount += 1
+                maps.lavabackup = maps.lavaArray[lavacount]
+                mapNumber += 1
+                mapBuild(plan:mapSelect(number:mapNumber))
+                currentMap = mapSelect(number:mapNumber)
+                break
             }
         case .arrowDown:
-            if currentMap[mapPosition.y+1][mapPosition.x] == 1 {
-                currentMap[mapPosition.y][mapPosition.x] = 0
+            if maps.lavaArray[lavacount][mapPosition.y+1][mapPosition.x] == 1 {
+                maps.lavaArray[lavacount][mapPosition.y][mapPosition.x] = 0
                 cursor.position = Point(x:cursor.position.x, y:cursor.position.y+1)
                 mapPosition = Point(x:mapPosition.x, y:mapPosition.y+1)
                 mainWindow.refresh()
             }
-            else if currentMap[mapPosition.y+1][mapPosition.x] == 0 {
-                mapBuild(plan:backup)
-                cursor.position = backupCoordinates
+            else if maps.lavaArray[lavacount][mapPosition.y+1][mapPosition.x] == 0 {
+                maps.lavaArray[lavacount] = maps.lavabackup
+                mapBuild(plan:mapSelect(number:mapNumber))
+            }
+            else if maps.lavaArray[lavacount][mapPosition.y+1][mapPosition.x] == 2 {
+                maps.lavaArray[lavacount][mapPosition.y][mapPosition.x] = 0
+                for rows in maps.lavaArray[lavacount] {
+                    for cell in rows {
+                        if cell == 0 {
+                            maps.lavaArray[lavacount] = maps.lavabackup
+                            mapBuild(plan:mapSelect(number:mapNumber))
+                        }
+                    }
+                }
+                lavacount += 1
+                maps.lavabackup = maps.lavaArray[lavacount]
+                mapNumber += 1
+                mapBuild(plan:mapSelect(number:mapNumber))
+                currentMap = mapSelect(number:mapNumber)
+                break
             }
         case .arrowLeft:
-            if currentMap[mapPosition.y][mapPosition.x-1] == 1 {
-                currentMap[mapPosition.y][mapPosition.x] = 0
+            if maps.lavaArray[lavacount][mapPosition.y][mapPosition.x-1] == 1 {
+                maps.lavaArray[lavacount][mapPosition.y][mapPosition.x] = 0
                 cursor.position = Point(x:cursor.position.x-1, y:cursor.position.y)
                 mapPosition = Point(x:mapPosition.x-1, y:mapPosition.y)
                 mainWindow.refresh()
             }
-            else if currentMap[mapPosition.y-1][mapPosition.x] == 0 {
-                mapBuild(plan:backup)
-                cursor.position = backupCoordinates
+            else if maps.lavaArray[lavacount][mapPosition.y][mapPosition.x-1] == 0 {
+                maps.lavaArray[lavacount] = maps.lavabackup
+                mapBuild(plan:mapSelect(number:mapNumber))
+            }
+            else if maps.lavaArray[lavacount][mapPosition.y][mapPosition.x-1] == 2 {
+                maps.lavaArray[lavacount][mapPosition.y][mapPosition.x] = 0
+                for rows in maps.lavaArray[lavacount] {
+                    for cell in rows {
+                        if cell == 0 {
+                            maps.lavaArray[lavacount] = maps.lavabackup
+                            mapBuild(plan:mapSelect(number:mapNumber))
+                        }
+                    }
+                }
+                lavacount += 1
+                maps.lavabackup = maps.lavaArray[lavacount]
+                mapNumber += 1
+                mapBuild(plan:mapSelect(number:mapNumber))
+                currentMap = mapSelect(number:mapNumber)
+                break
             }
         case .arrowRight:
-            if currentMap[mapPosition.y][mapPosition.x+1] == 1 {
-                currentMap[mapPosition.y][mapPosition.x] = 0
+            if maps.lavaArray[lavacount][mapPosition.y][mapPosition.x+1] == 1 {
+                maps.lavaArray[lavacount][mapPosition.y][mapPosition.x] = 0
                 cursor.position = Point(x:cursor.position.x+1, y:cursor.position.y)
                 mapPosition = Point(x:mapPosition.x+1, y:mapPosition.y)
                 mainWindow.refresh()
             }
-            else if currentMap[mapPosition.y-1][mapPosition.x] == 0 {
-                mapBuild(plan:backup)
-                cursor.position = backupCoordinates
+            else if maps.lavaArray[lavacount][mapPosition.y][mapPosition.x+1] == 0 {
+                maps.lavaArray[lavacount] = maps.lavabackup
+                mapBuild(plan:mapSelect(number:mapNumber))
+            }
+            else if maps.lavaArray[lavacount][mapPosition.y][mapPosition.x+1] == 2 {
+                maps.lavaArray[lavacount][mapPosition.y][mapPosition.x] = 0
+                for rows in maps.lavaArray[lavacount] {
+                    for cell in rows {
+                        if cell == 0 {
+                            maps.lavaArray[lavacount] = maps.lavabackup
+                            mapBuild(plan:mapSelect(number:mapNumber))
+                        }
+                    }
+                }
+                lavacount += 1
+                maps.lavabackup = maps.lavaArray[lavacount]
+                mapNumber += 1
+                mapBuild(plan:mapSelect(number:mapNumber))
+                currentMap = mapSelect(number:mapNumber)
+                break
             }
         default: do {
                      if key.character == "1" && currentMap[mapPosition.y][mapPosition.x] != 0 {
