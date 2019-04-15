@@ -17,6 +17,32 @@ class Handler : CursesHandlerProtocol {
 
 let handler = Handler()
 
+struct Items {
+    var wallbreaker = false
+    var lavafloor = false
+    var backpack = false
+    var resurrect = false
+    var con = false
+    var flag = false
+    var ration = false
+    var conflagration = false
+}
+
+class Player {
+    static var name = "Player"
+    static var health = 10
+    static var attackMelee = 3
+    static var potions = 0
+    static var items = Items()
+}
+
+class Enemy {
+    var name = "Enemy"
+    var health = 5
+    var attackMelee = 1
+    var drops = Items()
+}
+
 class Maze {
     var data: [[Int]] = []
 
@@ -36,8 +62,19 @@ class Maze {
         data[2][2] = 1
         self.carve(x: 2, y: 2)
         self.room(xSize:width,ySize:height)
+        self.enemies(xSize:width,ySize:height)
         data[1][2] = 1
         data[height - 2][width - 3] = 2
+
+        //test
+        for i in 0 ..< width {
+            data[0][i] = 0
+            data[height-1][i] = 0
+        }
+        for i in 0 ..< height {
+            data[i][0] = 0
+            data[i][width-1] = 0
+        }
     }
 
     func room(xSize:Int,ySize:Int) {
@@ -62,6 +99,19 @@ class Maze {
         }
     }//func room
 
+    func enemies(xSize: Int, ySize: Int) {
+        var averageEnemies = xSize*ySize/50
+        var random1 : Int
+        var random2 : Int
+        repeat {
+            random1 = Int.random(in:0..<ySize)
+            random2 = Int.random(in:0..<xSize)
+            if data[random1][random2] == 1 {
+                data[random1][random2] = 3
+            }
+        } while averageEnemies > 0 
+    }//func enemies
+    
     // Carve out maze inside
     func carve(x: Int, y: Int) {
         let upx = [1, -1, 0, 0]
@@ -87,33 +137,32 @@ class Maze {
 //generates random maze
 
 let maze1 = Maze(width: 50, height: 30)
+let maze2 = Maze(width: 50, height: 30)
+let maze3 = Maze(width: 50, height: 30)
+let maze4 = Maze(width: 50, height: 30)
+let maze5 = Maze(width: 50, height: 30)
+let maze6 = Maze(width: 50, height: 30)
+let maze7 = Maze(width: 50, height: 30)
+let maze8 = Maze(width: 50, height: 30)
+let maze9 = Maze(width: 50, height: 30)
+let maze10 = Maze(width: 50, height: 30)
+let maze11 = Maze(width: 50, height: 30)
+let maze12 = Maze(width: 50, height: 30)
+let maze13 = Maze(width: 50, height: 30)
+let maze14 = Maze(width: 50, height: 30)
+let maze15 = Maze(width: 50, height: 30)
+let maze16 = Maze(width: 50, height: 30)
+let maze17 = Maze(width: 50, height: 30)
+let maze18 = Maze(width: 50, height: 30)
+let maze19 = Maze(width: 50, height: 30)
+let maze20 = Maze(width: 50, height: 30)
+let maze21 = Maze(width: 50, height: 30)
+let maze22 = Maze(width: 50, height: 30)
+let maze23 = Maze(width: 50, height: 30)
+let maze24 = Maze(width: 50, height: 30)
+let maze25 = Maze(width: 50, height: 30)
 
-struct Items {
-    var wallbreaker = false
-    var lavafloor = false
-    var backpack = false
-    var resurrect = false
-    var con = false
-    var flag = false
-    var ration = false
-    var conflagration = false
-}
 
-class Player {
-    static var name = "Player"
-    static var health = 10
-    static var attackMelee = 3
-    static var attackRanged : Int?
-    static var items = Items()
-}
-
-class Enemy {
-    var name = "Enemy"
-    var health = 5
-    var attackMelee = 1
-    var attackRanged : Int?
-    var drops = Items()
-}
 
 print("Please enter your name: ", terminator:"")
 let player = Player()
@@ -173,6 +222,8 @@ func mapBuild(plan: [[Int]]) {
                 mainWindow.write(" ")
             } else if cell == 2 {
                 mainWindow.write("༜")
+            } else if cell == 3 {
+                mainWindow.write("X")
             }
         }
         locationY += 1
@@ -290,7 +341,14 @@ while true {
         }//switchcase
     }//standard
     while inventory {
-/*        mainWindow.write("""┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+        func inventoryLabel(position:Point, label: String) {
+            cursor.pushPosition(newPosition:position)
+            mainWindow.write(label)
+            cursor.popPosition()
+        }
+        cursor.pushPosition(newPosition:Point(x:0,y:0))
+        mainWindow.write("""
+                            ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
                             ┃                                                   ┃
                             ┃                                                   ┃
                             ┃                                                   ┃
@@ -306,17 +364,25 @@ while true {
                             ┃                                                   ┃
                             ┃                                                   ┃
                             ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-""")*/
-          let key = keyboard.getKey(window:mainWindow)
+                           """)
+        
+        inventoryLabel(position:Point(x:3,y:1), label:"\(Player.name)")
+        inventoryLabel(position:Point(x:3, y:3), label: "Health: \(Player.health)")
+        inventoryLabel(position:Point(x:3,y:5), label:"Potions: \(Player.potions)")
+        inventoryLabel(position:Point(x:3,y:7), label: "Level:\(mapNumber)")
+        
+        let key = keyboard.getKey(window:mainWindow)
         switch (key.keyType) {
         default: do {
                      if key.character == "i" {
+                         cursor.popPosition()
+                         mapBuild(plan:mapSelect(number:mapNumber))
                          standard = true
                          inventory = false
                      }
                  }
-        }
-    }
+        }//switchcase
+    }//while inventory
     
     while wallbreaker {
         cursor.pushPosition(newPosition:Point(x:0,y:0))
