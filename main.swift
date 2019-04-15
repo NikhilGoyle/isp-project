@@ -63,6 +63,7 @@ class Maze {
         self.carve(x: 2, y: 2)
         self.room(xSize:width,ySize:height)
         self.enemies(xSize:width,ySize:height)
+        self.drops(xSize:width,ySize:height)
         data[1][2] = 1
         data[height - 2][width - 3] = 2
 
@@ -100,7 +101,7 @@ class Maze {
     }//func room
 
     func enemies(xSize: Int, ySize: Int) {
-        var averageEnemies = xSize*ySize/50
+        var averageEnemies = xSize*ySize/500
         var random1 : Int
         var random2 : Int
         repeat {
@@ -108,9 +109,38 @@ class Maze {
             random2 = Int.random(in:0..<xSize)
             if data[random1][random2] == 1 {
                 data[random1][random2] = 3
+                averageEnemies -= 1
             }
         } while averageEnemies > 0 
     }//func enemies
+
+    func drops(xSize: Int, ySize: Int) {
+        if Int.random(in:1...2) == 1 {
+            var random1 : Int
+            var random2 : Int
+            var dropPlaced = false
+            
+            repeat {
+                if Int.random(in:1...2) == 1 {
+                    random1 = Int.random(in:1...4)
+                } else {
+                    random1 = Int.random(in:ySize-4...ySize-1)
+                }
+                
+                if Int.random(in:1...2) == 1{
+                    random2 = Int.random(in:1...4)
+                } else {
+                    random2 = Int.random(in:xSize-4...xSize-1)
+                }
+                
+                if data[random1][random2] == 1 {
+                    data[random1][random2] = 4
+                    dropPlaced = true
+                }
+            } while dropPlaced == false
+            
+        }//50% chance
+    } //drops function
     
     // Carve out maze inside
     func carve(x: Int, y: Int) {
@@ -224,6 +254,8 @@ func mapBuild(plan: [[Int]]) {
                 mainWindow.write("༜")
             } else if cell == 3 {
                 mainWindow.write("X")
+            } else if cell == 4 {
+                mainWindow.write("O")
             }
         }
         locationY += 1
