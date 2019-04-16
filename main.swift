@@ -395,23 +395,32 @@ cursor.popPosition()
 let enemyNameArray = ["Spider","Goblin","Zombie","Troll","Demon"]
 
 func createEnemy() {
-            func calculateHealth(level:Int)-> Int {
+    var count = 0
+    func calculateHealth(level:Int)-> Int {
+        count = 0
+        var unequal = true
                 if level < 5 {
                     return 5
                 } else if level < 10 {
                     return Int.random(in:6...8)
                 } else if level > 10 {
                     var one = pow(1.2, Double(level))*2
-                    for i in stride(from:1, to:999, by: 1) {
-                        if Double(i) > one {
-                            one = Double(i-1)
+                    while unequal {
+                        if Double(count) > one {
+                            one = Double(count)
+                            unequal = false
                         }
+                        count += 1
                     }
+                    unequal = true
+                    count = 0
                     var two = pow(1.2, Double(level))*3
-                    for i in stride(from:1, to:999, by: 1) {
-                        if Double(i) > two {
-                            two = Double(i-1)
+                    while unequal {
+                        if Double(count) > two {
+                            two = Double(count)
+                            unequal = false
                         }
+                        count += 1
                     }
                     return Int.random(in:Int(one)...Int(two))
                 }
@@ -419,22 +428,30 @@ func createEnemy() {
             }//healthcalc
             
             func calculateAttack(level:Int)-> Int {
+                count = 0
+                var unequal = true
                 if level < 5 {
                     return 1
                 } else if level < 10 {
                     return Int.random(in:2...4)
                 } else if level > 10 {
                     var one = pow(1.15, Double(level))*1
-                    for i in stride(from:1, to:999, by: 1) {
-                        if Double(i) > one {
-                            one = Double(i-1)
+                    while unequal {
+                        if Double(count) > one {
+                            one = Double(count)
+                            unequal = false
                         }
+                        count += 1
                     }
+                    unequal = true
                     var two = pow(1.2, Double(level))*2
-                    for i in stride(from:1, to:999, by: 1) {
-                        if Double(i) > two {
-                            two = Double(i-1)
+                    count = 0
+                    while unequal {
+                        if Double(count) > two {
+                            two = Double(count)
+                            break
                         }
+                        count += 1
                     }
                     return Int.random(in:Int(one)...Int(two))
                 }
@@ -454,19 +471,19 @@ while true {
         }
         if killcount > 1 {
             maxHP = 10+killcount
-            Player.attackMelee = 3+killcount/3
+            Player.attackMelee = 3+killcount/5
         }
         if killcount > 5 {
             maxHP = 10+2*killcount
-            Player.attackMelee = 3+killcount/2
+            Player.attackMelee = 3+killcount/3
         }
         if killcount > 10 {
             maxHP = 10+3*killcount
-            Player.attackMelee = 3+killcount
+            Player.attackMelee = 3+killcount/2
         }
         if killcount > 15 {
             maxHP = 10+5*killcount
-            Player.attackMelee = 3+killcount*2
+            Player.attackMelee = 3+killcount
         }
     
         cursor.pushPosition(newPosition:Point(x:0,y:0))
@@ -490,18 +507,20 @@ while true {
                 standard = false
                 break
             }
-            if currentMap[mapPosition.y-1][mapPosition.x] == 1 {
-                cursor.position = Point(x:cursor.position.x, y:cursor.position.y-1)
-                mapPosition = Point(x:mapPosition.x, y:mapPosition.y-1)
-                mainWindow.refresh()
-            }
             if currentMap[mapPosition.y-1][mapPosition.x] == 4 {
                 cursor.position = Point(x:cursor.position.x, y:cursor.position.y-1)
                 mapPosition = Point(x:mapPosition.x, y:mapPosition.y-1)
                 currentMap[mapPosition.y][mapPosition.x] = 1
                 Player.potions += 3
                 mapBuild(plan:currentMap)
+                break
             }
+            if currentMap[mapPosition.y-1][mapPosition.x] == 1 {
+                cursor.position = Point(x:cursor.position.x, y:cursor.position.y-1)
+                mapPosition = Point(x:mapPosition.x, y:mapPosition.y-1)
+                mainWindow.refresh()
+            }
+            
         case .arrowDown:
             if currentMap[mapPosition.y+1][mapPosition.x] == 2 {
                 mapNumber += 1
@@ -517,17 +536,18 @@ while true {
                 standard = false
                 break
             }
-            if currentMap[mapPosition.y+1][mapPosition.x] == 1 {
-                cursor.position = Point(x:cursor.position.x, y:cursor.position.y+1)
-                mapPosition = Point(x:mapPosition.x, y:mapPosition.y+1)
-                mainWindow.refresh()
-            }
             if currentMap[mapPosition.y+1][mapPosition.x] == 4 {
                 cursor.position = Point(x:cursor.position.x, y:cursor.position.y+1)
                 mapPosition = Point(x:mapPosition.x, y:mapPosition.y+1)
                 currentMap[mapPosition.y][mapPosition.x] = 1
                 Player.potions += 3
                 mapBuild(plan:currentMap)
+                break
+            }
+            if currentMap[mapPosition.y+1][mapPosition.x] == 1 {
+                cursor.position = Point(x:cursor.position.x, y:cursor.position.y+1)
+                mapPosition = Point(x:mapPosition.x, y:mapPosition.y+1)
+                mainWindow.refresh()
             }
         case .arrowLeft:
             if currentMap[mapPosition.y][mapPosition.x-1] == 2 {
@@ -544,17 +564,18 @@ while true {
                 standard = false
                 break
             }
-            if currentMap[mapPosition.y][mapPosition.x-1] == 1 {
-                cursor.position = Point(x:cursor.position.x-1, y:cursor.position.y)
-                mapPosition = Point(x:mapPosition.x-1, y:mapPosition.y)
-                mainWindow.refresh()
-            }
             if currentMap[mapPosition.y][mapPosition.x-1] == 4 {
                 cursor.position = Point(x:cursor.position.x-1, y:cursor.position.y)
                 mapPosition = Point(x:mapPosition.x-1, y:mapPosition.y)
                 currentMap[mapPosition.y][mapPosition.x] = 1
                 Player.potions += 3
                 mapBuild(plan:currentMap)
+                break
+            }
+            if currentMap[mapPosition.y][mapPosition.x-1] == 1 {
+                cursor.position = Point(x:cursor.position.x-1, y:cursor.position.y)
+                mapPosition = Point(x:mapPosition.x-1, y:mapPosition.y)
+                mainWindow.refresh()
             }
         case .arrowRight:
             if currentMap[mapPosition.y][mapPosition.x+1] == 2 {
@@ -571,19 +592,20 @@ while true {
                 standard = false
                 break
             }
-            if currentMap[mapPosition.y][mapPosition.x+1] == 1 {
-                cursor.position = Point(x:cursor.position.x+1, y:cursor.position.y)
-                mapPosition = Point(x:mapPosition.x+1, y:mapPosition.y)
-                mainWindow.refresh()
-            }
             if currentMap[mapPosition.y][mapPosition.x+1] == 4 {
                 cursor.position = Point(x:cursor.position.x+1, y:cursor.position.y)
                 mapPosition = Point(x:mapPosition.x+1, y:mapPosition.y)
                 currentMap[mapPosition.y][mapPosition.x] = 1
                 Player.potions += 3
                 mapBuild(plan:currentMap)
+                break
             }
-        default: do {
+            if currentMap[mapPosition.y][mapPosition.x+1] == 1 {
+                cursor.position = Point(x:cursor.position.x+1, y:cursor.position.y)
+                mapPosition = Point(x:mapPosition.x+1, y:mapPosition.y)
+                mainWindow.refresh()
+            }
+                    default: do {
                      if key.character == "2" && currentMap[mapPosition.y][mapPosition.x] != 0 {
                          wallbreaker = true
                          standard = false
@@ -637,7 +659,7 @@ while true {
                            """)
         
         inventoryLabel(position:Point(x:3,y:1), label:"\(Player.name)")
-        inventoryLabel(position:Point(x:3, y:3), label: "Health: \(Player.health)")
+        inventoryLabel(position:Point(x:3, y:3), label: "Health: \(Player.health)/\(maxHP)")
         inventoryLabel(position:Point(x:3,y:5), label:"Potions: \(Player.potions)")
         inventoryLabel(position:Point(x:3,y:7), label: "Level:\(mapNumber)")
         
@@ -681,24 +703,26 @@ while combat {
         default: do {
                      if key.character == " " {
                          enemyHealth -= Player.attackMelee
+                         if enemyHealth <= 0 {
+                             cursor.pushPosition(newPosition:Point(x:0,y:0))
+                             mainWindow.write("                                                                                                                                                                                                                                                                                                                                                                 ")
+                             cursor.pushPosition(newPosition:Point(x:0,y:0))
+                             currentMap[mapPosition.y][mapPosition.x] = 1
+                             mapBuild(plan:currentMap)
+                             mainWindow.write("The \(enemyName) has been killed")
+                             killcount += 1
+                             cursor.popPosition()
+                             cursor.popPosition()
+                             standard = true
+                             combat = false
+                         } else {
                          Player.health -= enemyAttackMelee
+                         mainWindow.refresh()
                          cursor.pushPosition(newPosition:Point(x:0,y:1))
                          mainWindow.write("You hit the \(enemyName) for \(Player.attackMelee). The \(enemyName) hit you back for \(enemyAttackMelee)")
                          cursor.popPosition()             
                          mainWindow.refresh()
-                     }
-                     if enemyHealth <= 0 {
-                         cursor.pushPosition(newPosition:Point(x:0,y:0))
-                         mainWindow.write("                                                                                                                                                                                                                                                                                                                                                                 ")
-                         cursor.pushPosition(newPosition:Point(x:0,y:0))
-                         currentMap[mapPosition.y][mapPosition.x] = 1
-                         mainWindow.write("The \(enemyName) has been killed")
-                         killcount += 1
-                         mapBuild(plan:currentMap)
-                         cursor.popPosition()
-                         cursor.popPosition()
-                         standard = true
-                         combat = false
+                         }
                      }
                  }
         }//switchcase
@@ -802,10 +826,10 @@ while combat {
         }//switchcase
     }//wallbreaker
     while lavafloor {
+        mapBuild(plan:maps.lavaArray[lavacount])
         cursor.pushPosition(newPosition:Point(x:0,y:0))
         mainWindow.write("The floor is lava! The more spaces you can turn red before going to the end, the more potions you get!")
         cursor.popPosition()
-        mapBuild(plan:maps.lavaArray[lavacount])
         mainWindow.refresh()
         let key = keyboard.getKey(window:mainWindow)
         switch (key.keyType) {
